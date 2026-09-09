@@ -70,8 +70,41 @@ namespace MCC::Splitscreen {
         }
 
         if (show_splitscreen) {
-            if (ImGui::Begin("Splitscreen", &show_splitscreen, ImGuiWindowFlags_MenuBar))
+            if (ImGui::Begin("Splitscreen", &show_splitscreen, ImGuiWindowFlags_MenuBar)) {
                 RealContext();
+                ImGui::Separator();
+                auto p_setting = AlphaRing::Global::MCC::Splitscreen();
+                ImGui::Text("XInput ports:");
+                for (int i = 0; i < 4; ++i) {
+                    XINPUT_STATE state{};
+                    bool connected = AlphaRing::Input::GetXInputGetState(i, &state);
+                    bool active = connected &&
+                        (state.Gamepad.wButtons != 0 ||
+                         state.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD ||
+                         state.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD ||
+                         state.Gamepad.sThumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
+                         state.Gamepad.sThumbLX >  XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
+                         state.Gamepad.sThumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
+                         state.Gamepad.sThumbLY >  XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+                    ImGui::Text("  Port %d: %s%s", i,
+                                connected ? "connected" : "DISCONNECTED",
+                                active ? "  (receiving input)" : "");
+                }
+                for (int i = 0; i < p_setting->player_count && i < 4; ++i) {
+                    auto profile = CGameManager::get_profile(i);
+                    if (profile)
+                        ImGui::Text("  Player %d -> port %d", i + 1, profile->controller_index);
+                }
+                auto dm = DeviceManager();
+                ImGui::Text("Game devices:");
+                for (int i = 0; i < 5; ++i) {
+                    auto* dev = dm ? dm->p_input_device[i] : nullptr;
+                    if (dev)
+                        ImGui::Text("  Device %d: present (input_user=%d)", i, dev->input_user);
+                    else
+                        ImGui::Text("  Device %d: MISSING", i);
+                }
+            }
             ImGui::End();
         }
     }
