@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Configure
         run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
@@ -20,7 +20,7 @@ jobs:
         run: cmake --build build --config Release --parallel
 
       - name: Upload DLL
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: WTSAPI32
           path: build/Release/WTSAPI32.dll
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download DLL
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: WTSAPI32
 

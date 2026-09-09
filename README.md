@@ -1,5 +1,8 @@
 # AlphaRing - thejackbitt fork
 
+[![Build](https://img.shields.io/github/actions/workflow/status/el-mango-cosmico/AlphaRing/build.yml?branch=master-chief&label=build)](https://github.com/el-mango-cosmico/AlphaRing/actions)
+[![Release](https://img.shields.io/github/v/release/el-mango-cosmico/AlphaRing?label=release&include_prereleases)](https://github.com/el-mango-cosmico/AlphaRing/releases)
+
 >
 > **Based on:** JackBitt's AlphaRing v1.2.1 (commit `bdad7eb`)
 >
