@@ -38,6 +38,31 @@
 | Crouch | Left Stick Click |
 | Zoom | Right Stick Click |
 
+#### 4. Controller Diagnostics (Splitscreen)
+- The Splitscreen window now shows a live **XInput port readout** (ports 0-3, connected vs. disconnected, and whether a port is receiving input)
+- It also lists the game's **input device objects** (`Game devices:`) and the XInput port (`input_user`) each one polls, plus each player's current port assignment
+- Useful for figuring out why a second controller isn't detected or isn't controlling its player
+
+---
+
+## CI Builds & Releases
+
+Every push builds `WTSAPI32.dll` on a **Windows GitHub Actions runner** (MSVC + vcpkg for SDL2/SDL2_mixer) and uploads it as the `WTSAPI32` artifact:
+
+```bash
+# download the latest artifact from the Actions page, or from your Deck/Arch box:
+gh run download <run-id> -R el-mango-cosmico/AlphaRing -n WTSAPI32
+```
+
+Tagging a version (e.g. `v0.2-beta`) publishes a **beta Release** with the DLL attached:
+
+```bash
+git tag v0.2-beta && git push origin v0.2-beta
+gh release download -R el-mango-cosmico/AlphaRing --pattern WTSAPI32.dll
+```
+
+Copy `WTSAPI32.dll` into the MCC `mcc/binaries/win64/` folder of your Steam library to install.
+
 ---
 
 ## Original Alpha Ring
@@ -62,7 +87,7 @@ A Modding Tool for MCC
 ### Installation
 Make sure you have the latest [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) installed.
 
-Download the latest stable build from the [Releases](https://github.com/kirklandsig/AlphaRing/releases) page.
+Download the latest build from the [Releases](https://github.com/el-mango-cosmico/AlphaRing/releases) page (or a CI artifact, see [CI Builds & Releases](#ci-builds--releases)).
 
 Place the DLL into the "Halo The Master Chief Collection\mcc\binaries\win64" directory and launch the game with EAC off.
 
@@ -104,21 +129,32 @@ When the menu is open, game input is disabled.
 
 ## Building from Source
 
+> Most users don't need this — the CI pipeline builds the DLL automatically.
+> See [CI Builds & Releases](#ci-builds--releases).
+
 ### Prerequisites
 - Visual Studio 2022 Build Tools
 - CMake 3.27+
+- vcpkg with `sdl2` and `sdl2_mixer` installed (`x64-windows-static-md`):
+
+  ```
+  vcpkg install sdl2 sdl2-mixer --triplet x64-windows-static-md
+  ```
 
 ### Build Commands
 ```bash
 # First time setup
 mkdir build && cd build
-cmake .. -G "Visual Studio 17 2022" -A x64
+cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
 
 # Build
 "C:/Program Files (x86)/Microsoft Visual Studio/2022/BuildTools/MSBuild/Current/Bin/MSBuild.exe" WTSAPI32.vcxproj -p:Configuration=Release -p:Platform=x64
 ```
 
 Output: `build/Release/WTSAPI32.dll`
+
+> **Note:** The prebuilt libraries under `lib/*/lib/release/` are MSVC COFF import libraries,
+> so MinGW on Linux cannot link this project — use MSVC (or the CI runner).
 
 ---
 
