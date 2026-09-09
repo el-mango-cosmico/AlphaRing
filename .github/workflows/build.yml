@@ -35,9 +35,12 @@ jobs:
         with:
           name: WTSAPI32
 
+      - name: Locate DLL
+        run: find . -name WTSAPI32.dll -exec cp {} ./WTSAPI32.dll \;
+
       - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          files: WTSAPI32/WTSAPI32.dll
+          files: WTSAPI32.dll
           generate_release_notes: true
           prerelease: true
